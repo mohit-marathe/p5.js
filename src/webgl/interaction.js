@@ -16,7 +16,7 @@ import * as constants from '../core/constants';
  * from the center of the sketch. This function can be called with parameters
  * dictating sensitivity to mouse movement along the X and Y axes.  Calling
  * this function without parameters is equivalent to calling orbitControl(1,1).
- * To reverse direction of movement in either axis, enter a negative number
+ * To reverse the direction of movement in either axis, enter a negative number
  * for sensitivity.
  * @method orbitControl
  * @for p5
