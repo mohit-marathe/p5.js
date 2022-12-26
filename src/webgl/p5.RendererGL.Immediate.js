@@ -32,7 +32,7 @@ import './p5.RenderBuffer';
  */
 p5.RendererGL.prototype.beginShape = function(mode) {
   this.immediateMode.shapeMode =
-    mode !== undefined ? mode : constants.TRIANGLE_FAN;
+    mode !== undefined ? mode : constants.TESS;
   this.immediateMode.geometry.reset();
   return this;
 };
@@ -116,7 +116,11 @@ p5.RendererGL.prototype.vertex = function(x, y) {
         u /= this._tex.width;
         v /= this._tex.height;
       }
-    } else if (this._tex === null && arguments.length >= 4) {
+    } else if (
+      !this.isProcessingVertices &&
+      this._tex === null &&
+      arguments.length >= 4
+    ) {
       // Only throw this warning if custom uv's have  been provided
       console.warn(
         'You must first call texture() before using' +
@@ -179,7 +183,9 @@ p5.RendererGL.prototype.endShape = function(
     );
     return this;
   }
+  this.isProcessingVertices = true;
   this._processVertices(...arguments);
+  this.isProcessingVertices = false;
   if (this._doFill) {
     if (this.immediateMode.geometry.vertices.length > 1) {
       this._drawImmediateFill();
@@ -254,6 +260,13 @@ p5.RendererGL.prototype._calculateEdges = function(
         res.push([i, i + 2]);
       }
       res.push([i, i + 1]);
+      break;
+    case constants.TRIANGLE_FAN:
+      for (i = 1; i < verts.length - 1; i++) {
+        res.push([0, i]);
+        res.push([i, i + 1]);
+      }
+      res.push([0, verts.length - 1]);
       break;
     case constants.TRIANGLES:
       for (i = 0; i < verts.length - 2; i = i + 3) {
